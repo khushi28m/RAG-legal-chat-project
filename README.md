@@ -1,16 +1,64 @@
-# React + Vite
+RAG Legal Chat – AI-Powered Legal Assistant
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This project implements a Retrieval-Augmented Generation (RAG) system that answers legal queries using actual statutory text and other reference documents. The system retrieves the most relevant text chunks from the indexed legal corpus and generates concise, citation-grounded responses using an LLM (Gemini by default, OpenAI as optional fallback).
 
-Currently, two official plugins are available:
+Features
+1. Legal Document Processing
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+Accepts PDF and text files.
 
-## React Compiler
+Cleans, normalizes, and chunks long documents (default: 1200 characters with 200 overlap).
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+Stores chunks as .jsonl with metadata (source_id, chunk_index, title, full text).
 
-## Expanding the ESLint configuration
+2. Vector Embeddings and Semantic Search
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+Uses SentenceTransformers (all-MiniLM-L6-v2) to create embeddings.
+
+Uses FAISS (IndexFlatIP) for fast semantic search.
+
+Returns top-k relevant chunks with metadata required for RAG.
+
+3. RAG Answer Generation
+
+Uses a unified LLM client supporting:
+
+Gemini models (primary)
+
+OpenAI models (fallback if configured)
+
+Produces:
+
+A short, plain-language answer
+
+Clear citations in the format: source_id:chunk_index
+
+No hallucinated content (strict grounding in retrieved text)
+
+4. Backend (FastAPI)
+
+Endpoints:
+
+GET /health – status check
+
+POST /retrieve – semantic document search
+
+POST /chat – full RAG pipeline (retrieval + LLM answer)
+
+5. Frontend (React + Vite)
+
+Chat-style UI
+
+Shows conversation history
+
+Handles streaming or standard responses
+
+Easy to deploy on Vercel / Netlify
+
+6. Deployment-Ready
+
+Backend deployable to Render, Railway, or any cloud
+
+Frontend deployable to Vercel or Netlify
+
+Environment-variable driven configuration
